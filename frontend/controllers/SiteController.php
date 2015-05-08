@@ -18,15 +18,7 @@ use yii\filters\AccessControl;
  */
 class SiteController extends Controller
 {
-    public $layout = 'newmain';
-    public $css = [
-        'css/bootstrap.css',
-        'css/sb-admin.css',
-        'css/site.css',
-    ];
-    public $js = [
-
-    ];
+    //public $layout = 'newmain';
     /**
      * @inheritdoc
      */

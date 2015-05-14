@@ -2,9 +2,14 @@
 
 namespace frontend\controllers;
 
+use app\models\CommunicationMembers;
 use Yii;
+use app\models\Customer;
+use app\models\CustomerContacts;
 use app\models\Project;
-use app\models\ProjectSearch;
+use app\models\ProjectTeam;
+use app\models\Roles;
+use app\models\Communication;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -124,15 +129,88 @@ class ProjectController extends Controller
         }
     }
 
-//    public function actionTeam(){
-//        $model = new User;
-//        $users = $model->findAll(['status' => 10]);
-//        return $this->render('team', [
-//            'users' => $users,
-//        ]);
-//    }
+    public function actionTeam($id)
+    {
+        $model = new ProjectTeam();
 
-    public function actionAddmember(){
+        if($model->load(yii::$app->request->post()) && $model->save()){
+            //return $this->redirect(['index']);
+        }
+        $team = ProjectTeam::find($id)->joinWith(['user', 'role'])->all();
+        $excludeIds = $model->exludeIds($team);
 
+        $users = User::find()->where('id NOT IN ('.$excludeIds.')')->all();
+        $roles = Roles::find()->all();
+        $projects = Project::find()->all();
+
+        return $this->render('team', [
+            'users' => $users,
+            'team' => $team,
+            'roles' => $roles,
+            'model' => $model,
+            'projects' => $projects,
+        ]);
+    }
+
+    public function actionCustomer($id)
+    {
+        $project = Project::find($id)->one();
+        $customer = Customer::find($project->customer_id)->one();
+        $customer_contacts = CustomerContacts::findAll(['customer_id' => $customer->idcustomer]);
+        return $this->render('customer',[
+            'customer' => $customer,
+            'customer_contacts' => $customer_contacts,
+        ]);
+    }
+
+    public function actionRoles()
+    {
+        $this->layout = 'main';
+        $roles = new Roles();
+        $request = yii::$app->request->post();
+
+        if ($roles->load($request)){
+            $roles->save();
+            return $this->redirect(['roles']);
+        }
+
+
+        return $this->render('roles', [
+            'roles' => Roles::find()->all(),
+            'rolesModel' => $roles,
+        ]);
+    }
+
+    public function actionCommunication($id)
+    {
+        $communication_model = new Communication();
+        $communication_members_model = new CommunicationMembers();
+
+        $request = yii::$app->request->post();
+
+        if($request)
+            $request['Communication']['communication_date'] = strtotime($request['Communication']['communication_date']);
+
+        if($communication_model->load($request) && $communication_model->save())
+        {
+            $request['CommunicationMembers']['communication_id'] = $communication_model->idcommunication;
+            $member_ids = $request['CommunicationMembers']['user_id'];
+            foreach($member_ids as $member_id){
+                $request['CommunicationMembers']['user_id'] = $member_id;
+                $communication_members_model_tmp = new CommunicationMembers();
+                if($communication_members_model_tmp->load($request) && $communication_members_model_tmp->save())
+                    echo 1;
+            }
+        }
+
+
+
+        return $this->render('communication', [
+            'communication_model' => $communication_model,
+            'communication_members_model' => $communication_members_model,
+            'communications' => Communication::find()->where('project_id = :id' , [':id' => $id])->joinWith('communicationMembers')->joinWith('user')->all(),
+            'members' => ProjectTeam::find()->where('project_id = :id', [':id' => $id])->joinWith('user')->all(),
+            //'members' => User::find()->where('project_id = :id', [':id' => $id])->joinWith('user')->all(),
+        ]);
     }
 }

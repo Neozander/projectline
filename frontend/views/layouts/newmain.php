@@ -28,13 +28,14 @@ AppAsset::register($this);
     <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <ul class="navbar-nav navbar-right nav" id="w1">
-                <li class="active"><a href="/projectline/frontend/web/index.php?r=site%2Findex">Home</a></li>
+                <li class="active"><a href="/projectline/frontend/web/">Home</a></li>
                 <?php
                     if (Yii::$app->user->isGuest) {
                         echo '<li>' . html::a('Регистрация', Yii::getAlias('@web') . '/site/signup') . '</li>';
                         echo '<li>' . html::a('Вход', Yii::getAlias('@web') . '/site/login') . '</li>';
                     } else {
-                        echo '<li>' . html::a('Проекты', Yii::getAlias('@web') . '/project/') . '</li>';
+                        echo '<li>' . html::a('Проекты', Yii::getAlias('@web') . '/project') . '</li>';
+                        echo '<li>' . html::a('Роли', Yii::getAlias('@web') . '/roles') . '</li>';
                         echo '<li>' . html::a('Выход('.Yii::$app->user->identity->username.')', Yii::getAlias('@web') . '/site/logout',
                                 ['data-method' => 'post']) . '</li>';
                     }
@@ -57,16 +58,16 @@ AppAsset::register($this);
                     <a href="#files" data-toggle="tab"><i class="fa fa-paperclip fa-fw"></i> Файлы</a>
                 </li>
                 <li>
-                    <a href="#client" data-toggle="tab"><i class="fa fa-user fa-fw"></i> Заказчик</a>
+                    <a href="<?= yii::getAlias('@web')?>/project/<?= yii::$app->request->get('id') ?>/customer" data-toggle="tab"><i class="fa fa-user fa-fw"></i> Заказчик</a>
                 </li>
                 <li>
-                    <a href="<?= yii::getAlias('@web')?>/project/team" data-toggle="tab"><i class="fa fa-users fa-fw"></i> Команда</a>
+                    <a href="<?= yii::getAlias('@web')?>/project/<?= yii::$app->request->get('id') ?>/team" data-toggle="tab"><i class="fa fa-users fa-fw"></i> Команда</a>
                 </li>
                 <li>
                     <a href="#project_info" data-toggle="tab"><i class="fa fa-list-alt fa-fw"></i> Данные по проекту</a>
                 </li>
                 <li>
-                    <a href="#messages" data-toggle="tab"><i class="fa fa-comments-o fa-fw"></i> Переписка</a>
+                    <a href="<?= yii::getAlias('@web')?>/project/<?= yii::$app->request->get('id') ?>/communication" data-toggle="tab"><i class="fa fa-comments-o fa-fw"></i> Переписка</a>
                 </li>
             </ul>
             <!-- /#side-menu -->

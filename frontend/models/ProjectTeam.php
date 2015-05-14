@@ -2,6 +2,8 @@
 
 namespace app\models;
 
+use common\models\User;
+
 use Yii;
 
 /**
@@ -71,6 +73,14 @@ class ProjectTeam extends \yii\db\ActiveRecord
      */
     public function getRole()
     {
-        return $this->hasOne(UserRoles::className(), ['iduser_roles' => 'role_id']);
+        return $this->hasOne(Roles::className(), ['iduser_roles' => 'role_id']);
+    }
+
+    public function exludeIds($result){
+        $exclude = '';
+        foreach($result as $row){
+            $exclude.= $row->user_id . ',';
+        }
+        return substr($exclude, 0, -1);
     }
 }

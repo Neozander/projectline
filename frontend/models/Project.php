@@ -104,4 +104,5 @@ class Project extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Timeline::className(), ['project_id' => 'idproject']);
     }
+
 }
